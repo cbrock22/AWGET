@@ -8,5 +8,9 @@
 # Member2 Name: XXXXXX
 # Member2 SIS ID: XXXXXX
 # Member2 Login ID: XXXXXX
+
+# Member3 Name: Zach Walsh
+# Member3 SIS ID: 83195530
+# Member3 Login ID: DaTimeKeeper
 ###############################################
 
