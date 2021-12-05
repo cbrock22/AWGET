@@ -50,7 +50,7 @@ def Main(argv):
         
     # print(url)
     # print(ssInfo)
-    ssIndex=random.randint(0,totalSS)
+    ssIndex=random.randint(0,totalSS-1)
     nextSS=ssInfo.pop(ssIndex)
     # print(ssInfo)
     # print(ssIndex)
@@ -59,19 +59,25 @@ def Main(argv):
     
 
     # local host IP '127.0.0.1'
-    
-    host = ssInfo[0]
+    host = nextSS[0] 
+    # host = '127.0.0.1' #Local Host overwrite
   
     # Define the port on which you want to connect
-    port = ssInfo[1]
+    port = nextSS[1]
+    # port = 2000 #Local Host Overwrite
   
     s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    return 0
+    
     # connect to server on local computer
     s.connect((host,port))
   
     # message you send to server
-    message = input('input a message')
+    message=url
+    for x in ssInfo:
+
+        message=message+"\n"+str(x[0])+" "+str(x[1])
+    print(message)
+    
     while True:
   
         # message sent to server
