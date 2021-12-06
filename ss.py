@@ -41,12 +41,12 @@ class ClientThread(Thread):
                 y = url.split('/')
                 filename = y.pop()
                 print(filename)
-                #awgetresponse = "response\n"
                 if len(x) == 0:
                     print("the list is empty!")
                     os.system("wget {}".format(url))
                     f = open('./index.html', 'r')
                     awgetresponse = f.readlines()
+                    
                     print(len(awgetresponse))
                     for element in awgetresponse:
                         element += '\n'
@@ -55,7 +55,11 @@ class ClientThread(Thread):
                     #print("-------AWGET RESPONSE---------")
                     awgetresponse  = str(awgetresponse)
                     print(len(awgetresponse))
-
+                    awgetresponse = awgetresponse[2:len(awgetresponse)-2]
+                    print(awgetresponse[0])
+                    print(awgetresponse[len(awgetresponse)-1])
+                    awgetresponse+=("response\n")
+                    
                     
                     c.send(awgetresponse.encode("ascii"))
                         
