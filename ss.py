@@ -35,36 +35,36 @@ class ClientThread(Thread):
             try:
                 data = c.recv(262144)
                 data = (data.decode("ascii"))
-                print(data)
+                # print(data)
+                # print(data[len(data)-10:len(data)-1])
+
                 x = data.split('\n')
                 url = x.pop(0)
                 y = url.split('/')
                 filename = y.pop()
-                print(filename)
+                # print(filename)
                 if len(x) == 0:
-                    print("the list is empty!")
-                    os.system("wget {}".format(url))
-                    f = open('./index.html', 'r')
-                    awgetresponse = f.readlines()
+                    # print("the list is empty!")
+                    os.system("wget -O tFile {}".format(url))
+                    f = open('./tFile', 'rb')
+                    #awgetresponse = f.read()
                     
-                    print(len(awgetresponse))
-                    for element in awgetresponse:
-                        element += '\n'
                     #print(len(awgetresponse))
-                    #print(awgetresponse[0])
-                    #print("-------AWGET RESPONSE---------")
-                    awgetresponse  = str(awgetresponse)
-                    print(len(awgetresponse))
-                    awgetresponse = awgetresponse[2:len(awgetresponse)-2]
-                    print(awgetresponse[0])
-                    print(awgetresponse[len(awgetresponse)-1])
-                    awgetresponse+=("response\n")
+                    
+                    #awgetresponse  = str(awgetresponse)
                     
                     
-                    c.send(awgetresponse.encode("ascii"))
-                        
+                    #awgetresponse+=("response\n")
+                    
+                    #print(len(awgetresponse))
+                    while True:
+                        message = f.read(1024)
+                        # print(message)
+                        if not message:
+                            break
+                        c.send(message)    
                 if len(x) != 0:
-                    print("the list is not empty!")
+                    # print("the list is not empty!")
                     randindex = random.randint(0, len(x)-1)
                     nextss = x.pop(randindex)
                     nextss.split(' ')
@@ -73,9 +73,12 @@ class ClientThread(Thread):
                     print("ss has connected to nextss with IP: {} and port: {}".format(nextss[0], nextss[1]))
                     message = url
                     message += str(x)
-                    soc2.send(message.encode("ascii"))
-                    data2 = soc2.recv(4096)
-                    c.send(data2)
+                    soc2.send(message)
+                    while True:
+                        data2 = soc2.recv(1024)
+                        if not data2:
+                            break
+                        c.send(data2)
                     soc2.close()
                     c.close()
                 break
@@ -89,9 +92,9 @@ if(len(sys.argv) != 2):
 portNum = sys.argv[1]
 print('starting stepper...')
 conn = socket.gethostname()
-print(conn)
+#print(conn)
 IP = socket.gethostbyname(conn)
-print(IP)
+#print(IP)
 soc = socket.socket(AF_INET, SOCK_STREAM)
 soc.bind(('127.0.0.1', int(portNum)))
 soc.listen(5)

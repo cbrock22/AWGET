@@ -71,11 +71,18 @@ def Main(argv):
         s.send(message.encode('ascii'))
         
         # messaga received from server
-        data = s.recv(262144)
-        data = data.decode("ascii")
+        temp = ''
+        while True:
+            data = s.recv(1024)
+            
+            if not data:
+                break
+            temp += str(data)[2:-1]
+        
+        #data = data.decode("ascii")
         # print the received message
-        concatdata = ''.join(data)
-        print('Received from the server :', concatdata)
+        #concatdata = ''.join(data)
+        print('Received from the server :', temp)
         #print(len(concatdata))
 
         #HERE IS WHERE YOU WILL SAVE THE DATA FROM THE WGET REQUEST
