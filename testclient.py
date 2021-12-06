@@ -86,7 +86,12 @@ def Main(argv):
         #print(len(concatdata))
 
         #HERE IS WHERE YOU WILL SAVE THE DATA FROM THE WGET REQUEST
+        #string = "hello world"
         
+        filename = ''
+        
+        fileo = open(filename, "w")
+        fileo.write(temp)
         
         #print(data)
         

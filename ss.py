@@ -33,33 +33,24 @@ class ClientThread(Thread):
     def run(self):
         while True:
             try:
-                data = c.recv(262144)
+                data = c.recv(264144)
                 data = (data.decode("ascii"))
                 # print(data)
                 # print(data[len(data)-10:len(data)-1])
-
                 x = data.split('\n')
                 url = x.pop(0)
                 y = url.split('/')
                 filename = y.pop()
-                # print(filename)
+                print(filename)
                 if len(x) == 0:
-                    # print("the list is empty!")
+
                     os.system("wget -O tFile {}".format(url))
                     f = open('./tFile', 'rb')
-                    #awgetresponse = f.read()
-                    
-                    #print(len(awgetresponse))
-                    
-                    #awgetresponse  = str(awgetresponse)
-                    
-                    
-                    #awgetresponse+=("response\n")
-                    
-                    #print(len(awgetresponse))
+
                     while True:
                         message = f.read(1024)
                         # print(message)
+                        #c.send("-1-".encode("ascii"))
                         if not message:
                             break
                         c.send(message)    
@@ -83,6 +74,8 @@ class ClientThread(Thread):
                     c.close()
                 break
             except KeyboardInterrupt:
+                soc2.close()
+                c.close()
                 break
 
 
