@@ -99,7 +99,7 @@ def Main(argv):
         #print(data)
         
         # ask the client whether he wants to continue
-        ans = input('\nDo you want to continue(y/n) :')
+        ans = input('\nDo you want to continue(y/n) : ')
         if ans == 'y':
             continue
         else:

@@ -41,10 +41,10 @@ class ClientThread(Thread):
                 url = x.pop(0)
                 y = url.split('/')
                 filename = y.pop()
-                print(filename)
+                #print(filename)
                 if len(x) == 0:
 
-                    os.system("wget -O tFile {}".format(url))
+                    os.system("wget -O tFile -o tfilelog {}".format(url))
                     f = open('./tFile', 'rb')
 
                     while True:
@@ -53,7 +53,8 @@ class ClientThread(Thread):
                         #c.send("-1-".encode("ascii"))
                         if not message:
                             break
-                        c.send(message)    
+                        c.send(message)
+                    break    
                 if len(x) != 0:
                     # print("the list is not empty!")
                     randindex = random.randint(0, len(x)-1)
@@ -61,7 +62,7 @@ class ClientThread(Thread):
                     nextss.split(' ')
                     soc2 = socket.socket(AF_INET, SOCK_STREAM)
                     soc2.connect(nextss[0], nextss[1])
-                    print("ss has connected to nextss with IP: {} and port: {}".format(nextss[0], nextss[1]))
+                    print("Connected to Next Stepping Stone {}:{}".format(nextss[0], nextss[1]))
                     message = url
                     message += str(x)
                     soc2.send(message)
@@ -71,40 +72,46 @@ class ClientThread(Thread):
                             break
                         c.send(data2)
                     soc2.close()
-                    c.close()
                 break
             except KeyboardInterrupt:
                 soc2.close()
                 c.close()
-                break
+                exit(1)
+        c.close()
+        print("[-] thread with IP : {} and port {} connection closed, going back to listening...".format(self.ip, self.port))
+        os.system("rm tFile")
+        os.system("rm tfilelog")
+        return
 
 
-if(len(sys.argv) != 2):
-    print('Please specify only one port number.')
+if(len(sys.argv) != 3):
+    print('incorrect arguments')
+    print('correct usage : python3 ss.py -p [port number]')
     exit(1)
-portNum = sys.argv[1]
-print('starting stepper...')
+portNum = sys.argv[2]
+
 conn = socket.gethostname()
 #print(conn)
 IP = socket.gethostbyname(conn)
 #print(IP)
 soc = socket.socket(AF_INET, SOCK_STREAM)
-soc.bind(('127.0.0.1', int(portNum)))
+soc.bind((IP, int(portNum)))
 soc.listen(5)
-#print('socket with IP {} on port {} is listening...'.format(IP,portNum))
+print('Starting Stepping Stone with IP : {} on port : {} ... '.format(IP,portNum))
 threads = []
 
 while True:
     try:
+        
         (c, (sourceip,sourceport)) = soc.accept()
         newthread = ClientThread(sourceip,portNum)
         newthread.start()
         threads.append(newthread)
-        break
+        break #wont want this in final code - needs to go back to listening
     except KeyboardInterrupt:
         c.close()
         soc.close()
-        break
+        exit(1)
 
 for t in threads:
     t.join()

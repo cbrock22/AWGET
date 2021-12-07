@@ -88,15 +88,14 @@ def Main(argv):
         #HERE IS WHERE YOU WILL SAVE THE DATA FROM THE WGET REQUEST
         #string = "hello world"
         
-        filename = ''
-        
-        fileo = open(filename, "w")
-        fileo.write(temp)
+        #filename = 'index.html'
+        #fileo = open(filename, "w")
+        #fileo.write(temp)
         
         #print(data)
         
         # ask the client whether he wants to continue
-        ans = input('\nDo you want to continue(y/n) :')
+        ans = input('\nDo you want to continue(y/n) : ')
         if ans == 'y':
             continue
         else:
