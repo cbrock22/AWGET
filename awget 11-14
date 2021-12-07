@@ -1,15 +1,7 @@
-file name = ''
-flag= true
-for c in reversed(temp):
-if (c=='/'):
-if (flag):
-flag= false
-continue
-break
-filename +=c
-#url=str url.split('/'))
-print(filename)
-print(len(url))
-fileo=open("index.html","w")
-fileo.write(temp)
-
+import urlparse
+def_filename (url):
+a=urlparse(url)
+filename=os.path.basename(a.path)
+if filename =='':
+filename="index.html"
+return filename 
