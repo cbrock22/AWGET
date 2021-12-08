@@ -38,7 +38,9 @@ class ClientThread(Thread):
                 # print(data)
                 # print(data[len(data)-10:len(data)-1])
                 x = data.split('\n')
+                
                 url = x.pop(0)
+                print("this is the url in the beginning {}".format(url))
                 y = url.split('/')
                 filename = y.pop()
                 #print(filename)
@@ -54,34 +56,47 @@ class ClientThread(Thread):
                         if not message:
                             break
                         c.send(message)
-                    break    
+                    break
                 if len(x) != 0:
                     # print("the list is not empty!")
                     randindex = random.randint(0, len(x)-1)
                     nextss = x.pop(randindex)
-                    nextss.split(' ')
+                    print(nextss)
+                    nextp = ''
+                    nextip = ''
+                    flag = False
+                    for char in nextss:
+                        if(char == ' '):
+                            flag = True
+                        if(flag == False):
+                            nextip += char
+                        elif(flag):
+                            nextp += char
+                    nextp = int(nextp)
+                    print("hopeful ip ",nextip)
+                    print("hopeful port ",nextp)
                     soc2 = socket.socket(AF_INET, SOCK_STREAM)
-                    soc2.connect(nextss[0], nextss[1])
-                    print("Connected to Next Stepping Stone {}:{}".format(nextss[0], nextss[1]))
+                    soc2.connect((nextip, nextp))
+                    print("Connected to Next Stepping Stone {}:{}".format(nextip, nextp))
                     message = url
                     message += str(x)
-                    soc2.send(message)
+                    soc2.send(message.encode())
                     while True:
                         data2 = soc2.recv(1024)
+                        data2 = data2.decode()
                         if not data2:
                             break
-                        c.send(data2)
+                        c.send(data2.encode())
                     soc2.close()
-                break
+                
             except KeyboardInterrupt:
                 soc2.close()
                 c.close()
                 exit(1)
-        c.close()
+        #c.close()
         print("[-] thread with IP : {} and port {} connection closed, going back to listening...".format(self.ip, self.port))
         os.system("rm tFile")
         os.system("rm tfilelog")
-        return
 
 
 if(len(sys.argv) != 3):
@@ -109,7 +124,6 @@ while True:
         threads.append(newthread)
         break #wont want this in final code - needs to go back to listening
     except KeyboardInterrupt:
-        c.close()
         soc.close()
         exit(1)
 
