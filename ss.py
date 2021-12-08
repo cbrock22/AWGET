@@ -21,7 +21,6 @@ import socket
 from socket import AF_INET, SOCK_STREAM
 from threading import Thread
 from socketserver import ThreadingMixIn
-
 class ClientThread(Thread):
 
     def __init__(self, ip, port):
@@ -35,59 +34,33 @@ class ClientThread(Thread):
             try:
                 data = c.recv(264144)
                 data = (data.decode("ascii"))
-                # print(data)
-                # print(data[len(data)-10:len(data)-1])
                 x = data.split('\n')
-                print("this is x at the start")
-                print(x)
                 url = x.pop(0)
-                if(len(x) == 1 and x[0] == '[]'):
-                    x.pop()
-                print("this is the url in the beginning {}".format(url))
-                print(url)
-                y = url.split('/')
-                filename = y.pop()
-                #print(filename)
+
                 if len(x) == 0:
-
                     os.system("wget -O tFile {}".format(url))
-                    
                     f = open('tFile', 'rb')
-
                     while True:
                         message = f.read(1024)
-                        #message = str(message)
-                        # print(message)
-                        #c.send("-1-".encode("ascii"))
+                        print(message)
+                        print()
                         if not message:
                             break
                         c.send(message)
                     break
                 if len(x) != 0:
-                    # print("the list is not empty!")
-                    randindex = random.randint(0, len(x)-1)
-                    nextss = x.pop(randindex)
-                    print(nextss)
-                    nextp = ''
-                    nextip = ''
-                    flag = False
-                    for char in nextss:
-                        if(char == ' '):
-                            flag = True
-                        if(flag == False):
-                            nextip += char
-                        elif(flag):
-                            nextp += char
-                    nextp = int(nextp)
-                    print("hopeful ip ",nextip)
-                    print("hopeful port ",nextp)
+                    ssInfo=[]
+                    for t in range(int(len(x))):
+                        if(t<=len(x)):
+                            tIp,tPort=x[t].split()
+                            ssInfo.append((tIp,int(tPort)))
+                    ssIndex=random.randint(0,len(x)-1)
+                    nextip,nextp=ssInfo.pop(ssIndex)
                     soc2 = socket.socket(AF_INET, SOCK_STREAM)
                     soc2.connect((nextip, nextp))
-                    print("Connected to Next Stepping Stone {}:{}".format(nextip, nextp))
-                    url = url + '\n'
                     message = url
-                    
-                    message += str(x)
+                    for t in ssInfo:
+                        message=message+'\n'+str(t[0]+" "+str(t[1]))
                     soc2.send(message.encode("ascii"))
                     while True:
                         data2 = soc2.recv(1024)
@@ -95,6 +68,7 @@ class ClientThread(Thread):
                             break
                         c.send(data2)
                     soc2.close()
+                    break
                 
             except KeyboardInterrupt:
                 soc2.close()
@@ -102,10 +76,8 @@ class ClientThread(Thread):
                 exit(1)
         c.close()
         print("[-] thread with IP : {} and port {} connection closed, going back to listening...".format(self.ip, self.port))
-        if(os.path.exists("tFile.txt")):
-            os.system("rm tFile.txt")
-        if(os.path.exists("tfilelog.txt")):
-            os.system("rm tfilelog.txt")
+        if(os.path.exists("./tFile")):
+            os.system("rm tFile")
         return
 
 
@@ -116,9 +88,7 @@ if(len(sys.argv) != 3):
 portNum = sys.argv[2]
 
 conn = socket.gethostname()
-#print(conn)
 IP = socket.gethostbyname(conn)
-#print(IP)
 soc = socket.socket(AF_INET, SOCK_STREAM)
 soc.bind((IP, int(portNum)))
 soc.listen(5)
@@ -132,10 +102,9 @@ while True:
         newthread = ClientThread(sourceip,portNum)
         newthread.start()
         threads.append(newthread)
-        break #wont want this in final code - needs to go back to listening
     except KeyboardInterrupt:
         soc.close()
-        exit(1)
+        break
 
 for t in threads:
     t.join()

@@ -1,37 +1,21 @@
-###############################################
-# Group Name  : Uber
-
-# Member1 Name: Cole Brock
-# Member1 SIS ID: 831823119
-# Member1 Login ID: cbrock22
-
-# Member2 Name: Alanood Alqobaisi
-# Member2 SIS ID: 832901420
-# Member2 Login ID: alanood
-
-# Member3 Name: Zach Walsh
-# Member3 SIS ID: 831955300
-# Member3 Login ID: zachwals
-###############################################
-# Import socket module
 import socket
 import sys
 import random
+import os
+from urllib.parse import urlparse
 
 def Main(argv):
-
-    # read file
     url=""
     filename="chaingang.txt"
     ssInfo=[]
     totalSS=0
     if len(argv)==1:
         url=argv[0]
-    elif len(argv)==2:
+    elif len(argv)==3 and argv[1]=="-c":
         url=argv[0]
-        filename=argv[1]
+        filename=argv[2]
     else:
-        print("error")
+        print("Bad Args")
         return 1
     
     try:    
@@ -48,64 +32,41 @@ def Main(argv):
     except:
         print("error")
         return 1
-        
-    # print(url)
-    #print(ssInfo)
     ssIndex=random.randint(0,totalSS-1)
-    #ssIndex = 0 #comment this out when you are ready to test with multiple IP's on the list
     nextSS=ssInfo.pop(ssIndex)
-    # print(ssInfo)
-    #print(ssIndex)
-    #print(nextSS)
-
-    
-
-    # local host IP '127.0.0.1'
     host = nextSS[0] 
     # host = '127.0.0.1' #Local Host overwrite
-  
-    # Define the port on which you want to connect
     port = nextSS[1]
     # port = 2000 #Local Host Overwrite
-  
     s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    
-    # connect to server on local computer
     s.connect((host,port))
-  
-    # message you send to server
     message=url
     for x in ssInfo:
 
         message=message+"\n"+str(x[0])+" "+str(x[1])
-    print("message being sent: \n", message)
     
+    s.send(message.encode('ascii'))
+    temp = ''
     while True:
-  
-        # message sent to server
-        s.send(message.encode('ascii'))
-        
-        # messaga received from server
-        data = s.recv(262144)
-        data = data.decode("ascii")
-        # print the received message
-        concatdata = ''.join(data)
-        print('Received from the server :', concatdata)
-        #print(len(concatdata))
-
-        #HERE IS WHERE YOU WILL SAVE THE DATA FROM THE WGET REQUEST
-        
-        
-        #print(data)
-        
-        # ask the client whether he wants to continue
-        ans = input('\nDo you want to continue(y/n) : ')
-        if ans == 'y':
-            continue
-        else:
+        data = s.recv(1024)
+        if not data:
             break
+        temp += data.decode("ISO-8859-1")
+    filen=get_filename(url)
+    f2=open(filen,'w')
+    f2.write(temp)
+    print(f"Url:{url} found. File saved as {filen}")
+    f2.close()
     # close the connection
     s.close()
+
+def get_filename(url):
+    a = urlparse(url)
+    filename = os.path.basename(a.path)
+    if len(filename)<=0 or '/' not in url:
+        filename = "index.html"
+    return filename
+
   
 if __name__ == '__main__':
     Main(sys.argv[1:])
