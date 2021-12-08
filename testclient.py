@@ -40,7 +40,7 @@ def Main(argv):
     ssIndex=random.randint(0,totalSS-1)
     #ssIndex = 0 #comment this out when you are ready to test with multiple IP's on the list
     nextSS=ssInfo.pop(ssIndex)
-    # print(ssInfo)
+    print(ssInfo)
     #print(ssIndex)
     #print(nextSS)
 
@@ -75,7 +75,7 @@ def Main(argv):
         temp = ''
         while True:
             data = s.recv(1024)
-            data = data.decode()
+            data = data.decode("ascii")
             if not data:
                 break
             temp += str(data)[2:-1]

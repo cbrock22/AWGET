@@ -38,19 +38,25 @@ class ClientThread(Thread):
                 # print(data)
                 # print(data[len(data)-10:len(data)-1])
                 x = data.split('\n')
-                
+                print("this is x at the start")
+                print(x)
                 url = x.pop(0)
+                if(len(x) == 1 and x[0] == '[]'):
+                    x.pop()
                 print("this is the url in the beginning {}".format(url))
+                print(url)
                 y = url.split('/')
                 filename = y.pop()
                 #print(filename)
                 if len(x) == 0:
 
-                    os.system("wget -O tFile -o tfilelog {}".format(url))
-                    f = open('./tFile', 'rb')
+                    os.system("wget -O tFile {}".format(url))
+                    
+                    f = open('tFile', 'rb')
 
                     while True:
                         message = f.read(1024)
+                        #message = str(message)
                         # print(message)
                         #c.send("-1-".encode("ascii"))
                         if not message:
@@ -78,25 +84,29 @@ class ClientThread(Thread):
                     soc2 = socket.socket(AF_INET, SOCK_STREAM)
                     soc2.connect((nextip, nextp))
                     print("Connected to Next Stepping Stone {}:{}".format(nextip, nextp))
+                    url = url + '\n'
                     message = url
+                    
                     message += str(x)
-                    soc2.send(message.encode())
+                    soc2.send(message.encode("ascii"))
                     while True:
                         data2 = soc2.recv(1024)
-                        data2 = data2.decode()
                         if not data2:
                             break
-                        c.send(data2.encode())
+                        c.send(data2)
                     soc2.close()
                 
             except KeyboardInterrupt:
                 soc2.close()
                 c.close()
                 exit(1)
-        #c.close()
+        c.close()
         print("[-] thread with IP : {} and port {} connection closed, going back to listening...".format(self.ip, self.port))
-        os.system("rm tFile")
-        os.system("rm tfilelog")
+        if(os.path.exists("tFile.txt")):
+            os.system("rm tFile.txt")
+        if(os.path.exists("tfilelog.txt")):
+            os.system("rm tfilelog.txt")
+        return
 
 
 if(len(sys.argv) != 3):
