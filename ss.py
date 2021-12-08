@@ -58,9 +58,10 @@ class ClientThread(Thread):
                         print()
                         if not message:
                             break
-                        c.send(message)
+                        c.send(message)   
                     print("Goodbye!")
                     f.close()
+                    os.system("rm tFile")
                     break
                 if len(x) != 0:
                     ssInfo=[]
@@ -96,9 +97,7 @@ class ClientThread(Thread):
                 soc2.close()
                 c.close()
                 exit(1)
-        c.close()
-        if(os.path.exists("./tFile")):
-            os.system("rm tFile")
+        c.close()    
         return
 
 
