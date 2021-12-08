@@ -54,8 +54,6 @@ class ClientThread(Thread):
                     print("Relaying file...")
                     while True:
                         message = f.read(1024)
-                        #print(message)
-                        print()
                         if not message:
                             break
                         c.send(message)   
