@@ -61,7 +61,7 @@ class ClientThread(Thread):
                         c.send(message)   
                     print("Goodbye!")
                     f.close()
-                    os.system("rm tFile")
+                    os.system("rm ./tFile")
                     break
                 if len(x) != 0:
                     ssInfo=[]
