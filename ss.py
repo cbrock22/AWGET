@@ -16,18 +16,25 @@
 from __future__ import unicode_literals
 import sys
 import os
+from urllib.parse import urlparse
 import random
 import socket
 from socket import AF_INET, SOCK_STREAM
 from threading import Thread
 from socketserver import ThreadingMixIn
+def get_filename(url):
+    a = urlparse(url)
+    filename = os.path.basename(a.path)
+    if len(filename)<=0 or '/' not in url:
+        filename = "index.html"
+    return filename
+
 class ClientThread(Thread):
 
     def __init__(self, ip, port):
         Thread.__init__(self)
         self.ip = ip
         self.port = port
-        print("[+] a new thread has started on {}:{}".format(ip,port))
 
     def run(self):
         while True:
@@ -36,17 +43,24 @@ class ClientThread(Thread):
                 data = (data.decode("ascii"))
                 x = data.split('\n')
                 url = x.pop(0)
+                filen = get_filename(url)
 
                 if len(x) == 0:
+                    print("chainlist is empty")
+                    print(f"issuing wget for file {filen}")
                     os.system("wget -O tFile {}".format(url))
+                    print("File received")
                     f = open('tFile', 'rb')
+                    print("Relaying file...")
                     while True:
                         message = f.read(1024)
-                        print(message)
+                        #print(message)
                         print()
                         if not message:
                             break
                         c.send(message)
+                    print("Goodbye!")
+                    f.close()
                     break
                 if len(x) != 0:
                     ssInfo=[]
@@ -56,17 +70,25 @@ class ClientThread(Thread):
                             ssInfo.append((tIp,int(tPort)))
                     ssIndex=random.randint(0,len(x)-1)
                     nextip,nextp=ssInfo.pop(ssIndex)
+                    print(f"Request: {url}")
+                    print("chainlist is")
+                    for thing in ssInfo:
+                        print(thing)
+                    print(f"next SS is <{nextip}, {nextp}")
                     soc2 = socket.socket(AF_INET, SOCK_STREAM)
                     soc2.connect((nextip, nextp))
                     message = url
                     for t in ssInfo:
                         message=message+'\n'+str(t[0]+" "+str(t[1]))
                     soc2.send(message.encode("ascii"))
+                    print("waiting for file...")
                     while True:
                         data2 = soc2.recv(1024)
                         if not data2:
                             break
                         c.send(data2)
+                    print("relaying file ...")
+                    print("Goodbye!")
                     soc2.close()
                     break
                 
@@ -75,7 +97,6 @@ class ClientThread(Thread):
                 c.close()
                 exit(1)
         c.close()
-        print("[-] thread with IP : {} and port {} connection closed, going back to listening...".format(self.ip, self.port))
         if(os.path.exists("./tFile")):
             os.system("rm tFile")
         return
@@ -92,7 +113,7 @@ IP = socket.gethostbyname(conn)
 soc = socket.socket(AF_INET, SOCK_STREAM)
 soc.bind((IP, int(portNum)))
 soc.listen(5)
-print('Starting Stepping Stone with IP : {} on port : {} ... '.format(IP,portNum))
+print('ss <{},{}>'.format(IP,portNum))
 threads = []
 
 while True:
