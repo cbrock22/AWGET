@@ -42,11 +42,11 @@ class ClientThread(Thread):
                     f = open('tFile', 'rb')
                     while True:
                         message = f.read(1024)
-                        print(message)
-                        print()
                         if not message:
                             break
                         c.send(message)
+                    f.close()
+                    os.system("rm ./tFile")
                     break
                 if len(x) != 0:
                     ssInfo=[]
@@ -76,8 +76,6 @@ class ClientThread(Thread):
                 exit(1)
         c.close()
         print("[-] thread with IP : {} and port {} connection closed, going back to listening...".format(self.ip, self.port))
-        if(os.path.exists("./tFile")):
-            os.system("rm tFile")
         return
 
 
